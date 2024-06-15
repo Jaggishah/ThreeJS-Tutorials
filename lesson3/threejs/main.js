@@ -1,33 +1,9 @@
-// import './style.css'
-// import javascriptLogo from './javascript.svg'
-// import viteLogo from '/vite.svg'
-// import { setupCounter } from './counter.js'
-// import * as THREE from "three";
 
-// console.log(THREE)
-// document.querySelector('#app').innerHTML = `
-//   <div>
-//     <a href="https://vitejs.dev" target="_blank">
-//       <img src="${viteLogo}" class="logo" alt="Vite logo" />
-//     </a>
-//     <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-//       <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-//     </a>
-//     <h1>Hello Vite!</h1>
-//     <div class="card">
-//       <button id="counter" type="button"></button>
-//     </div>
-//     <p class="read-the-docs">
-//       Click on the Vite logo to learn more
-//     </p>
-//   </div>
-// `
-
-// setupCounter(document.querySelector('#counter'))
 
 import * as THREE from 'three';
-
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 const canvas = document.querySelector('.webgl');
+
 // red cube
 const scene = new THREE.Scene();
 // const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -37,22 +13,65 @@ const scene = new THREE.Scene();
 const group = new THREE.Group();
 scene.add(group);
 
-const cube1 = new THREE.Mesh( new THREE.BoxGeometry(1,1,1) , new THREE.MeshBasicMaterial({ color: 0xff0000  }))
+const geometry = new THREE.BufferGeometry();
+
+const count = 500;
+const positionArray = new Float32Array(count *3 * 3);
+
+for ( let i = 0; i< count * 3*3 ; i++){
+    positionArray[i] = (Math.random() - 0.5) * 4
+}
+
+const positionAttribute = new THREE.BufferAttribute(positionArray,3);
+geometry.setAttribute('position',positionAttribute)
+
+const cube1 = new THREE.Mesh( geometry , 
+new THREE.MeshBasicMaterial({ color: 0xff0000 ,wireframe:true }))
 group.add(cube1);
 
 
 // mesh.rotation.x = 2;
 // Sizes
 const sizes = {
-    width : 800,
-    height : 600
+    width : window.innerWidth,
+    height : window.innerHeight
 }
 
+window.addEventListener('resize' , () => {
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    camera.aspect = sizes.width/sizes.height
+    camera.updateProjectionMatrix()
+    renderer.setSize(sizes.width, sizes.height);
+    renderer.setPixelRatio( Math.min(window.devicePixelRatio,2) )
+})
+
+window.addEventListener('dblclick',() => {
+    const dbFullScreen = document.fullscreenElement || document.webkitFullscreenElement;
+    if(!dbFullScreen){
+        if(canvas.requestFullscreen){
+            canvas.requestFullscreen();
+        }
+        else if(canvas.webkitFullscreenElement){
+            canvas.webkitFullscreenElement()
+        }
+        
+    }else{
+        if(document.exitFullscreen){
+            document.exitFullscreen()
+        }
+        
+    }
+})
 // camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width/sizes.height);
+const camera = new THREE.PerspectiveCamera(75, sizes.width/sizes.height,0.1,1000);
+const controls = new OrbitControls(camera, canvas);
+// controls.target.y = 2;
+// controls.update();
 camera.position.z = 3;
 
-scene.add(camera)
+scene.add(camera)   
 
 // Renderer
 console.log(canvas)
@@ -61,6 +80,7 @@ const renderer = new THREE.WebGLRenderer({
 })
 
 renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio( Math.min(window.devicePixelRatio,2) )
 
 
 
@@ -69,9 +89,10 @@ const clock = new THREE.Clock();
 const tick = () => {
     const elpased = clock.getElapsedTime();
 
-    camera.position.x = Math.sin(elpased);
-    camera.position.y = Math.cos(elpased);
+    // camera.position.x = Math.sin(elpased);
+    cube1.rotation.y = Math.cos(elpased);
 
+ 
     renderer.render( scene , camera);
     window.requestAnimationFrame(tick)
 }
