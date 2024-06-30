@@ -16,14 +16,14 @@ const scene = new THREE.Scene()
 // scene.add(axisHelper);
 
 const textureLoader = new THREE.TextureLoader();
-const matcapTexture = textureLoader.load('./1.png')
+const matcapTexture = textureLoader.load('./8.png')
 console.log(matcapTexture)
 
 const loader  = new FontLoader();
 const font = loader.parse(typeface);
 
 		// do something with the font
-const geometry = new TextGeometry('Hello three.js!',{
+const geometry = new TextGeometry('Hello 3d dev!',{
   font:font,
   size: 0.4,
   depth: 0.1,
@@ -53,7 +53,7 @@ scene.add(text)
 
 const donutGeometry = new THREE.TorusGeometry(0.3,0.2,20,45);
 
-for ( let i = 0 ; i < 1000 ; i++){
+for ( let i = 0 ; i < 500 ; i++){
   const donutMesh = new THREE.Mesh( donutGeometry, textMaterial);
   donutMesh.position.x = (Math.random() - 0.5) * 10
   donutMesh.position.y = (Math.random() - 0.5) * 10
